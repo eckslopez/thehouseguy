@@ -9,11 +9,8 @@ on:
     - cron: "0 9 * * 1" # Mondays 9:00 UTC
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pull-requests: read
-
 jobs:
   security:
     name: Security Scan
+    permissions: inherit
     uses: eckslopez/platform-pipelines/.github/workflows/security-scan.yml@main
