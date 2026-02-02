@@ -11,6 +11,16 @@ workflow and a provider abstraction for real-estate data sources.
 - Legacy RETS integration is disabled by default
 - CI checks: RuboCop, Brakeman, bundler-audit, tests
 
+## Part of ZaveStudios Platform
+
+This application runs as a tenant on the [ZaveStudios multi-tenant platform](link).
+
+**Platform integration:**
+- Namespace: `<app-name>` (isolated Kubernetes namespace)
+- Database: `db_<app-name>` tenant in [pg-multitenant](link)
+- Deployment: ArgoCD GitOps via [kubernetes-platform-infrastructure](link)
+- Observability: Shared Prometheus/Grafana
+
 ## Quick Start (Docker)
 
 ```sh
