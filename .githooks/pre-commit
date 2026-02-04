@@ -1,0 +1,39 @@
+#!/bin/sh
+set -e
+
+# Block commits that add likely secrets (basic heuristics over staged changes)
+# Scans added lines only.
+
+diff=$(git diff --cached --unified=0)
+
+# Common patterns: passwords, access keys, tokens, basic auth, AWS keys
+pattern='(password|passwd|pwd|secret|api[_-]?key|access[_-]?key|token|auth|bearer|basic)[[:space:]]*[:=][[:space:]]*[^[:space:]]'
+aws_key_id='AKIA[0-9A-Z]{16}'
+aws_secret='(?i)aws.+secret|secret[_-]?access[_-]?key'
+
+# Only scan added lines
+added=$(printf "%s" "$diff" | sed -n 's/^+//p' | sed -n '/^+++/d;p')
+
+if printf "%s" "$added" | grep -Eiq "$pattern"; then
+  echo "pre-commit: Potential secret detected (pattern match). Commit aborted." >&2
+  echo "Tip: Use env vars or encrypted secrets. If false positive, commit with SKIP_SECRET_CHECK=1" >&2
+  if [ -z "${SKIP_SECRET_CHECK:-}" ]; then
+    exit 1
+  fi
+fi
+
+if printf "%s" "$added" | grep -Eq "$aws_key_id"; then
+  echo "pre-commit: Potential AWS Access Key detected. Commit aborted." >&2
+  if [ -z "${SKIP_SECRET_CHECK:-}" ]; then
+    exit 1
+  fi
+fi
+
+if printf "%s" "$added" | grep -Eiq "$aws_secret"; then
+  echo "pre-commit: Potential AWS Secret detected. Commit aborted." >&2
+  if [ -z "${SKIP_SECRET_CHECK:-}" ]; then
+    exit 1
+  fi
+fi
+
+exit 0
