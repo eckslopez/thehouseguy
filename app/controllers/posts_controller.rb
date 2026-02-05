@@ -27,23 +27,25 @@ class PostsController < ApplicationController
   # POST /posts
   # POST /posts.json
   def create
-    @post = Post.new(post_params)
-    @post.process_original_image(params[:post][:original_image])
-    if @post.process_original_image(params[:post][:original_image])
-      respond_to do |format|
-        if @post.save
-          flash[:success] = 'Post successfully created.'
-          format.html { redirect_to @post }
-          format.json { render :show, status: :created, location: @post }
-        else
-          flash[:alert] = 'Something is seriously wrong.'
-          format.html { render :new }
-          format.json { render json: @post.errors, status: :unprocessable_entity }
-        end
-      end
-    else
+    upload = params.dig(:post, :original_image)
+    @post = Post.new(post_params.except(:original_image))
+
+    if upload.present? && !@post.process_original_image(upload)
       flash[:alert] = 'File upload must be an image'
       render :new
+      return
+    end
+
+    respond_to do |format|
+      if @post.save
+        flash[:success] = 'Post successfully created.'
+        format.html { redirect_to @post }
+        format.json { render :show, status: :created, location: @post }
+      else
+        flash[:alert] = 'Something is seriously wrong.'
+        format.html { render :new }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
     end
   end
 
