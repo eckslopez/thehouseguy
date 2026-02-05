@@ -7,21 +7,27 @@
       </div>
     </div>
   <% end %>
-  <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark"
-        style=" background-image:
-                  linear-gradient(to right, #0f0f0f, #000000, transparent),
-                  url('<%= url_for() %>');
-                background-size: 50% contain;
-                background-repeat: no-repeat;
-                background-position: right; ">
-    <div class="col-md-6 px-0">
-      <h1 class="display-4 font-italic"><%= @last_five[0].title %></h1>
-      <p class="lead my-3"><%= sanitize @last_five[0].body.truncate(100) %></p>
-      <p class="lead mb-0"><a href="<%= post_path(@last_five[0].id) %>" class="text-black font-weight-bold">Continue reading...</a></p>
+  <% latest_post = @last_five.first %>
+  <% secondary_posts = Array(@last_five[1..2]) %>
+  <% remaining_posts = Array(@last_five[3..-1]) %>
+
+  <% if latest_post %>
+    <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark"
+          style=" background-image:
+                    linear-gradient(to right, #0f0f0f, #000000, transparent),
+                    url('<%= url_for() %>');
+                  background-size: 50% contain;
+                  background-repeat: no-repeat;
+                  background-position: right; ">
+      <div class="col-md-6 px-0">
+        <h1 class="display-4 font-italic"><%= latest_post.title %></h1>
+        <p class="lead my-3"><%= sanitize latest_post.body.truncate(100) %></p>
+        <p class="lead mb-0"><a href="<%= post_path(latest_post.id) %>" class="text-black font-weight-bold">Continue reading...</a></p>
+      </div>
     </div>
-  </div>
+  <% end %>
   <div class="row my-4">
-    <% @last_five[1..2].each do |post| %>
+    <% secondary_posts.each do |post| %>
       <div class="col-md-6">
         <div class="card flex-md-row mb-4 box-shadow h-md-250">
           <div class="card-body d-flex flex-column align-items-start">
@@ -47,7 +53,7 @@
       <h3 class="pb-3 mb-4 font-italic border-bottom">
         From the Web Log
       </h3>
-      <% @last_five[3..-1].each do |post| %>
+      <% remaining_posts.each do |post| %>
         <div class="blog-post">
           <h2 class="blog-post-title">
             <a class="text-dark" href="<%= post_path(post.id) %>">

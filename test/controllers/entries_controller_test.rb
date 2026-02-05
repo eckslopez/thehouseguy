@@ -4,12 +4,13 @@ require 'test_helper'
 
 class EntriesControllerTest < ActionDispatch::IntegrationTest
   test 'should get index' do
-    get entries_index_url
+    get feed_entries_url(feed_id: feeds(:one))
     assert_response :success
   end
 
   test 'should get show' do
-    get entries_show_url
+    entry = entries(:one)
+    get feed_entry_url(feed_id: entry.feed_id, id: entry)
     assert_response :success
   end
 end
